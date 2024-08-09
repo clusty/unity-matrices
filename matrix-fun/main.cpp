@@ -2,7 +2,6 @@
 #include <chrono>
 #include "matrix.h"
 #include "Tensor4.h"
-#include "eigenTest.h"
 
 using Coords = Tensor4::Coords;
 
@@ -85,15 +84,12 @@ void TensorTest()
     {
         std::cout <<"Shuffle2 Works"<<std::endl;
     }
-    eigenTensorTest();
-
 }
 
 
 int main()
 {
-   // eigenTensorTest();
-    //TestTranspose();
+    TestTranspose();
     TensorTest();
     return 0;
 }
