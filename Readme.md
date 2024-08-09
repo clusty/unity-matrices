@@ -17,8 +17,7 @@ Please find the matrix class
 - Permutations are composable, so first compose permutations and then call Question 2
 
 *Question 4*
-- If a permutation swaps only 2 axis, the operation can be expressed as a transpose, if we copy back and forth the 2d slices (inefficient)
-- I think there might be permutations that allow us to skip the 2d slice copying
+- If a permutation swaps only 2 axis, the operation can be expressed as a "transpose", if the transpose routine can accept 2 extra strides. Memory is not contiguous
 
 *Question 5*
-- Need to copy slice, transpose and then copy back to the new position.
+- I need to refactor the question 1 utility function to accept the 2 extra strides.

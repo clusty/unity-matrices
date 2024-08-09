@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -20,6 +21,16 @@ void print_tensor(const vector<double>& tensor, size_t a, size_t b, size_t c, si
     cout << endl;
 }
 
+// Helper function to calculate strides for each dimension
+vector<size_t> calculate_strides(const vector<size_t>& dims) {
+    vector<size_t> strides(dims.size());
+    strides.back() = 1;
+    for (int i = dims.size() - 2; i >= 0; --i) {
+        strides[i] = strides[i + 1] * dims[i + 1];
+    }
+    return strides;
+}
+
 // Transpose two dimensions in a 4D tensor
 void transpose_2d(vector<double>& tensor, size_t dim1, size_t dim2, size_t stride1, size_t stride2, size_t block_size) {
     for (size_t i = 0; i < dim1; ++i) {
@@ -33,16 +44,21 @@ void transpose_2d(vector<double>& tensor, size_t dim1, size_t dim2, size_t strid
     }
 }
 
-// Perform the 4D tensor shuffle
-void tensor_transpose(vector<double>& tensor, size_t a, size_t b, size_t c, size_t d) {
-    // Transpose axes (0, 3): (a, b, c, d) -> (d, b, c, a)
-    transpose_2d(tensor, a, d, b * c * d, 1, b * c);
+// Perform the 4D tensor shuffle using a permutation array
+void tensor_transpose(vector<double>& tensor, vector<size_t>& dims, const vector<size_t>& perm) {
+    vector<size_t> strides = calculate_strides(dims);
+    vector<size_t> new_dims(dims.size());
 
-    // Transpose axes (1, 3): (d, b, c, a) -> (d, a, c, b)
-    transpose_2d(tensor, b, a, c * d, d, c);
-
-    // Transpose axes (2, 3): (d, a, c, b) -> (d, a, b, c)
-    transpose_2d(tensor, c, b, d, d * a, 1);
+    // Perform the necessary transpositions
+    for (size_t i = 0; i < perm.size(); ++i) {
+        for (size_t j = i + 1; j < perm.size(); ++j) {
+            if (perm[i] > perm[j]) {
+                transpose_2d(tensor, dims[i], dims[j], strides[i], strides[j], strides.back() / strides[i]);
+                swap(dims[i], dims[j]);
+                swap(strides[i], strides[j]);
+            }
+        }
+    }
 }
 
 int main() {
@@ -58,11 +74,15 @@ int main() {
     cout << "Original Tensor:" << endl;
     print_tensor(tensor, a, b, c, d);
 
-    // Perform the transpositions
-    tensor_transpose(tensor, a, b, c, d);
+    // Specify the desired permutation of dimensions (d, a, b, c)
+    vector<size_t> dims = {a, b, c, d};
+    vector<size_t> perm = {3, 0, 1, 2};
+
+    // Perform the transpositions based on the permutation
+    tensor_transpose(tensor, dims, perm);
 
     cout << "Transposed Tensor:" << endl;
-    print_tensor(tensor, d, a, b, c);  // The tensor is now in (d, a, b, c) order
+    print_tensor(tensor, dims[0], dims[1], dims[2], dims[3]);  // The tensor is now in the new permuted order
 
     return 0;
 }
