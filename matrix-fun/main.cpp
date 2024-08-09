@@ -69,7 +69,7 @@ void TensorTest()
 
     t.print();
 
-    constexpr std::array permutation = {1,0,2,3};
+    constexpr std::array permutation = {0,1,3,2};
     const auto permT = t.shuffle(permutation);
 
     std::cout<<"Permutation: "<<std::endl;
