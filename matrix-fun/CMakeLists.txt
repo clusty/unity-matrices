@@ -3,7 +3,7 @@ project(matrix-fun)
 
 set(CMAKE_CXX_STANDARD 26)
 
-set (CMAKE_CXX_FLAGS  "-march=native -O3")
+#set (CMAKE_CXX_FLAGS  "-march=native -O3")
 add_executable(matrix-fun matrix.cpp
         main.cpp
         matrix.h

@@ -77,11 +77,6 @@ void TensorTest()
     std::cout<<"Permutation: "<<std::endl;
     permT.print();
 
-    if (t.shuffle(permutation) == t.shuffleIterative(permutation))
-    {
-        std::cout <<"Shuffle Iterative Works"<<std::endl;
-    }
-
     // permutting twice should give the original T
     if (t.shuffle(permutation).shuffle(permutation) == t)
     {

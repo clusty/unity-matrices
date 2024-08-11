@@ -32,7 +32,7 @@ Matrix Matrix::transpose(const Algo a) const
     if (a == Block)
     {
         std::cout<<"Block"<<std::endl;
-        utils::TransposeBlockGeneric(_data.get(), result._data.get(), _dims);
+        utils::TransposeBlock(_data.get(), result._data.get(), _dims[0], _dims[1]);
     }
     else
     {

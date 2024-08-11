@@ -27,20 +27,9 @@ namespace utils
         }
     }
 
-    inline void blockTranspose(const float* src, float* dst,
-                    int rows, int cols,
-                    int rowStride, int colStride) {
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < cols; ++j) {
-            dst[j * colStride + i] = src[i * rowStride + j];
-        }
-    }
-}
 
-
-    inline void TransposeWithStrides(const float* src, float* dst,
-                             int rows, int cols,
-                             int rowStride, int colStride)
+    inline void TransposeWithStrides(const float* src, float* dst, const int rows, const int cols, const int rowStride,
+                                     const int colStride)
     {
 
         if (rows <= 1 && cols <= 1) {
@@ -85,62 +74,4 @@ namespace utils
     {
         return idx[permutation[1]] + idx[permutation[0]] * dims[permutation[1]];
     }
-
-
-    inline void TransposeBlockGeneric(const float *src, float *dst, const std::array<int, 2> dims)
-    {
-        constexpr std::array permutation = {1, 0};
-        constexpr std::array noopPermutation = {0, 1};
-
-        constexpr int BLOCK_SIZE = 32;
-        for (int ii = 0; ii < dims[0]; ii += BLOCK_SIZE)
-        {
-            for (int jj = 0; jj < dims[1]; jj += BLOCK_SIZE)
-            {
-                for (int i = ii; i < ii + BLOCK_SIZE && i < dims[0]; ++i)
-                {
-                    for (int j = jj; j < jj + BLOCK_SIZE && j < dims[1]; ++j)
-                    {
-                        const auto r = computeIndices({i, j}, dims, noopPermutation); // l + k * dims[1];
-                        const auto w = computeIndices({i, j}, dims, permutation); // k + l * dims[0];
-                        dst[w] = src[r];
-                    }
-                }
-            }
-        }
-    }
-
-    /*public int to1D( int x, int y, int z ) {
-    return (z * xMax * yMax) + (y * xMax) + x;
-}*/
-    /*inline int computeIndices(const std::array<int, 4> idx, const std::array<int, 4> dims,
-                   const std::array<int, 4> permutation)
-    {
-        const auto index = _dims[0] * _dims[1] * _dims[2] * k +
-                                         _dims[0] * _dims[1] * j +
-                                                    _dims[0] * i + l;
-        return idx[permutation[1]] + idx[permutation[0]] * dims[permutation[1]];
-    }*/
-    /*
-    void TransposeBlockGeneric(const float * src, float*  dst, std::array<int, 4> dims, std::array<int, 4> permutation)
-    {
-        constexpr std::array noopPermutation = { 0, 1 };
-
-        constexpr int BLOCK_SIZE = 32;
-        for (int ii = 0; ii < dims[0]; ii += BLOCK_SIZE)
-        {
-            for (int jj = 0; jj < dims[1]; jj += BLOCK_SIZE)
-            {
-                for (int i = ii; i < ii + BLOCK_SIZE && i < dims[0]; ++i)
-                {
-                    for (int j = jj; j < jj + BLOCK_SIZE && j < dims[1]; ++j)
-                    {
-                        const auto r = computeIndices({i,j}, dims, noopPermutation);//l + k * dims[1];
-                        const auto w = computeIndices({i,j}, dims, permutation); //k + l * dims[0];
-                        dst[w] = src[r];
-                    }
-                }
-            }
-        }
-    }*/
 }

@@ -83,32 +83,7 @@ namespace
             }
         }
     }
-
-    // Function to permute the dimensions of a 4D tensor using a permutation array
-    float* shuffleIterative(const float* input, float* newTensor, const std::array<int, 4>& dims, const std::array<int, 4>& perm) {
-        std::array newDims = {dims[perm[0]], dims[perm[1]], dims[perm[2]], dims[perm[3]]};
-
-        // Strides for each dimension in the original tensor
-        std::array newStride = {newDims[1] * newDims[2] * newDims[3], newDims[2] * newDims[3], newDims[3], 1};
-
-        for (int i = 0; i < dims[0]; ++i) {
-            for (int j = 0; j < dims[1]; ++j) {
-                for (int k = 0; k < dims[2]; ++k) {
-                    for (int l = 0; l < dims[3]; ++l) {
-                        std::array<int, 4> oldIndices = {i, j, k, l};
-                        std::array<int, 4> newIndices = {oldIndices[perm[0]], oldIndices[perm[1]], oldIndices[perm[2]], oldIndices[perm[3]]};
-
-                        int oldIndex = getIndex(oldIndices, dims);
-                        int newIndex = getIndex(newIndices, newDims);
-
-                        utils::TransposeWithStrides(&input[oldIndex], &newTensor[newIndex], newDims[perm[0]], newDims[perm[1]], newStride[0], newStride[1]);
-                    }
-                }
-            }
-        }
-
-        return newTensor;
-    }
+    
 
 }
 Tensor4::Tensor4(const Coords dims) :
@@ -125,13 +100,7 @@ Tensor4 Tensor4::shuffle(const std::array<int, 4> perm) const
     return std::move(ret);
 }
 
-Tensor4 Tensor4::shuffleIterative(Coords perm) const
-{
-    Tensor4 ret(ApplyPerm(_dims, perm));
-    shuffleTensor(_data.get(), ret._data.get(), _dims, perm);
 
-    return std::move(ret);
-}
 
 Tensor4 Tensor4::shuffle2(const Coords perm1, const Coords perm2) const
 {

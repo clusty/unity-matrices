@@ -21,3 +21,4 @@ Please find the matrix class
 
 *Question 5*
 - I need to refactor the question 1 utility function to accept the 2 extra strides.
+Did not finish !!!
