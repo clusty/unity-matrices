@@ -37,7 +37,7 @@ Matrix Matrix::transpose(const Algo a) const
     else
     {
         std::cout<<"Recursive"<<std::endl;
-        utils::TransposeRecursive(0, _dims[1], 0, _dims[0], _dims[1],_dims[0],_data.get(), result._data.get());
+        utils::TransposeWithStrides(_data.get(), result._data.get(), _dims[0], _dims[1], _dims[0], 1);
     }
     return std::move(result);
 }

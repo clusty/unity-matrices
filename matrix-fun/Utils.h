@@ -27,6 +27,38 @@ namespace utils
         }
     }
 
+    inline void blockTranspose(const float* src, float* dst,
+                    int rows, int cols,
+                    int rowStride, int colStride) {
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            dst[j * colStride + i] = src[i * rowStride + j];
+        }
+    }
+}
+
+
+    inline void TransposeWithStrides(const float* src, float* dst,
+                             int rows, int cols,
+                             int rowStride, int colStride)
+    {
+
+        if (rows <= 1 && cols <= 1) {
+            dst[0] = src[0];
+            return;
+        }
+
+        if (rows >= cols) {
+            int mid = rows / 2;
+            TransposeWithStrides(src, dst, mid, cols, rowStride, colStride);
+            TransposeWithStrides(src + mid * rowStride, dst + mid, rows - mid, cols, rowStride, colStride);
+        } else {
+            int mid = cols / 2;
+            TransposeWithStrides(src, dst, rows, mid, rowStride, colStride);
+            TransposeWithStrides(src + mid * colStride, dst + mid * rowStride, rows, cols - mid, rowStride, colStride);
+        }
+    }
+
     inline void TransposeBlock(const float *src, float *dst, const int M, const int N)
     {
         constexpr int BLOCK_SIZE = 32;

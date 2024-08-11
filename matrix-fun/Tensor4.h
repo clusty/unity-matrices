@@ -11,6 +11,7 @@ public:
 
     [[nodiscard]] Tensor4 shuffle(Coords perm) const;
     [[nodiscard]] Tensor4 shuffle2(Coords perm1,Coords perm2 ) const;
+    [[nodiscard]] Tensor4 shuffleIterative(Coords perm1) const;
     void print() const;
     bool operator==(const Tensor4 &) const;
    // [[nodiscard]] Tensor4 transpose() const;

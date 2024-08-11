@@ -10,7 +10,8 @@ add_executable(matrix-fun matrix.cpp
         Tensor4.cpp
         Tensor4.h
         Utils.h
-#        tensorMain.cpp
+       #tensorMain.cpp
+
 )
 
 
