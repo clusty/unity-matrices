@@ -20,7 +20,7 @@ void Matrix::print() const
         std::cout << "\n";
         for (int j = 0; j < _dims[1]; j++)
         {
-            std::cout << operator[](i, j) << " ";
+            std::cout << operator()(i, j) << " ";
         }
     }
 

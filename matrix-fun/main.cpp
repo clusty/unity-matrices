@@ -17,7 +17,7 @@ void TestTranspose()
     {
         for (int j = 0; j < l; j++)
         {
-            m[i,j] = idx++;
+            m(i,j) = idx++;
         }
     }
 
@@ -41,7 +41,7 @@ void TestTranspose()
         {
             for (int j = 0; j < l; j++)
             {
-                if (m[i,j] != mT[j,i])
+                if (m(i,j) != mT(j,i))
                 {
                     std::cout << "problem" << std::endl;
                 }
@@ -71,7 +71,7 @@ void TensorTest()
 
     t.print();
 
-    constexpr std::array permutation = {0,1,3,2};
+    constexpr std::array permutation = {1,0,3,2};
     const auto permT = t.shuffle(permutation);
 
     std::cout<<"Permutation: "<<std::endl;

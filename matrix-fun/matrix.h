@@ -10,7 +10,7 @@ public:
         Recursive
     };
     Matrix(int m, int n);
-    float& operator[](const int i, const int j) const
+    float& operator()(const int i, const int j) const
     {
         const int idx = j  + i * _dims[1];
         return _data.get()[idx];
