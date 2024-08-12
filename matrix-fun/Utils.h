@@ -2,40 +2,30 @@
 #include <array>
 namespace utils
 {
-    inline void TransposeRecursive(const int x, const int delx, const int y, const int dely, const int M, const int N,
+    inline void TransposeRecursive(const int x, const int dx, const int y, const int dy, const int M, const int N,
                             float *src, float *dst)
     {
         // doing it in blocks allows for better cache locality (cache oblivious algo)
         constexpr int BLOCK_SIZE = 32;
-        if (delx <= BLOCK_SIZE && dely <= BLOCK_SIZE) // unroll
+        if (dx <= BLOCK_SIZE && dy <= BLOCK_SIZE) // unroll
         {
-            for (int j = y; j < y + dely; j++)
-                for (int i = x; i < x + delx; i++)
+            for (int j = y; j < y + dy; j++)
+                for (int i = x; i < x + dx; i++)
                     dst[i * N + j] = src[j * M + i];
         }
-        else if (delx >= dely)
+        else if (dx >= dy)
         {
-            const int midX = delx / 2;
-            TransposeRecursive(x, midX, y, dely, M, N, src, dst);
-            TransposeRecursive(x + midX, delx - midX, y, dely, M, N, src, dst);
+            const int midX = dx / 2;
+            TransposeRecursive(x, midX, y, dy, M, N, src, dst);
+            TransposeRecursive(x + midX, dx - midX, y, dy, M, N, src, dst);
         }
         else
         {
-            const int midY = dely / 2;
-            TransposeRecursive(x, delx, y, midY, M, N, src, dst);
-            TransposeRecursive(x, delx, y + midY, dely - midY, M, N, src, dst);
+            const int midY = dy / 2;
+            TransposeRecursive(x, dx, y, midY, M, N, src, dst);
+            TransposeRecursive(x, dx, y + midY, dy - midY, M, N, src, dst);
         }
     }
-
-    inline void blockTranspose(const float* src, float* dst,
-                    int rows, int cols,
-                    int rowStride, int colStride) {
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < cols; ++j) {
-            dst[j * colStride + i] = src[i * rowStride + j];
-        }
-    }
-}
 
 
     inline void TransposeWithStrides(const float* src, float* dst,
