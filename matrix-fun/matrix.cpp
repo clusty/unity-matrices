@@ -10,7 +10,7 @@
 
 
 Matrix::Matrix(const int m, const int n) :
-    _data(static_cast<float *>(malloc( m * n * sizeof(float))), &free), _dims({m,n})
+    _data(m*n), _dims({m,n})
 {
 }
 void Matrix::print() const
@@ -32,12 +32,12 @@ Matrix Matrix::transpose(const Algo a) const
     if (a == Block)
     {
         std::cout<<"Block"<<std::endl;
-        utils::TransposeBlockGeneric(_data.get(), result._data.get(), _dims);
+        utils::TransposeBlockGeneric(_data.data(), result._data.data(), _dims);
     }
     else
     {
         std::cout<<"Recursive"<<std::endl;
-        utils::TransposeWithStrides(_data.get(), result._data.get(), _dims[0], _dims[1], _dims[0], 1);
+        utils::RecursiveTranspose(0,_dims[0], 0, _dims[1], _data.data(), result._data.data(), _dims[0], _dims[1] );
     }
     return std::move(result);
 }

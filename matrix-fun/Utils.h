@@ -2,50 +2,30 @@
 #include <array>
 namespace utils
 {
-    inline void TransposeRecursive(const int x, const int dx, const int y, const int dy, const int M, const int N,
-                            float *src, float *dst)
+    inline void RecursiveTranspose(const int rowBegin, const int rowEnd, const int columnBegin, const int columnEnd, const float* src, float *dst, const int rows, const int columns)
     {
-        // doing it in blocks allows for better cache locality (cache oblivious algo)
-        constexpr int BLOCK_SIZE = 32;
-        if (dx <= BLOCK_SIZE && dy <= BLOCK_SIZE) // unroll
+        constexpr int BLOCK_SIZE = 64;
+        const int r = rowEnd - rowBegin;
+        const int c = columnEnd - columnBegin;
+        if ( r <= BLOCK_SIZE && c <= BLOCK_SIZE)
         {
-            for (int j = y; j < y + dy; j++)
-                for (int i = x; i < x + dx; i++)
-                    dst[i * N + j] = src[j * M + i];
+            for (int i = rowBegin; i < rowEnd; i++)
+            {
+                for (int j = columnBegin; j < columnEnd; j++)
+                {
+                    dst[j * rows + i] = src[i * columns + j];
+                }
+            }
         }
-        else if (dx >= dy)
+        else if (r >= c)
         {
-            const int midX = dx / 2;
-            TransposeRecursive(x, midX, y, dy, M, N, src, dst);
-            TransposeRecursive(x + midX, dx - midX, y, dy, M, N, src, dst);
+            RecursiveTranspose(rowBegin, rowBegin + r / 2, columnBegin, columnEnd, src, dst, rows,columns);
+            RecursiveTranspose(rowBegin + r / 2, rowEnd, columnBegin, columnEnd, src, dst, rows,columns);
         }
         else
         {
-            const int midY = dy / 2;
-            TransposeRecursive(x, dx, y, midY, M, N, src, dst);
-            TransposeRecursive(x, dx, y + midY, dy - midY, M, N, src, dst);
-        }
-    }
-
-
-    inline void TransposeWithStrides(const float* src, float* dst,
-                             int rows, int cols,
-                             int rowStride, int colStride)
-    {
-
-        if (rows <= 1 && cols <= 1) {
-            dst[0] = src[0];
-            return;
-        }
-
-        if (rows >= cols) {
-            int mid = rows / 2;
-            TransposeWithStrides(src, dst, mid, cols, rowStride, colStride);
-            TransposeWithStrides(src + mid * rowStride, dst + mid, rows - mid, cols, rowStride, colStride);
-        } else {
-            int mid = cols / 2;
-            TransposeWithStrides(src, dst, rows, mid, rowStride, colStride);
-            TransposeWithStrides(src + mid * colStride, dst + mid * rowStride, rows, cols - mid, rowStride, colStride);
+            RecursiveTranspose(rowBegin, rowEnd, columnBegin, columnBegin + c / 2, src, dst, rows,columns);
+            RecursiveTranspose(rowBegin, rowEnd, columnBegin + c / 2, columnEnd, src, dst, rows,columns);
         }
     }
 

@@ -7,11 +7,11 @@ using Coords = Tensor4::Coords;
 
 void TestTranspose()
 {
-    /*constexpr int k = 4;
-    constexpr int l = 3;*/
+   /* constexpr int k = 3;
+    constexpr int l = 5;*/
     constexpr int k = 11000;
-    constexpr int l = 11000;
-    const Matrix m(k,l);
+    constexpr int l = 11001;
+    Matrix m(k,l);
     float idx = 0;
     for (int i = 0; i < k; i++)
     {
@@ -21,12 +21,12 @@ void TestTranspose()
         }
     }
 
-      //m.print();
+     // m.print();
 
         std::cout<<std::endl;
     {
         const auto start = std::chrono::high_resolution_clock::now();
-        const auto mT = m.transpose(Matrix::Recursive);
+        auto mT = m.transpose(Matrix::Recursive);
         //mT.print();
         const auto stop = std::chrono::high_resolution_clock::now();
 
@@ -37,25 +37,34 @@ void TestTranspose()
         // Blocksize 32 -> 138872 us
         // blocksize 1 ->  301906 us
         // Recursive        86731 us
-        for (int i = 0; i < k; i++)
+        bool correct = true;
+        for (int i = 0; i < k && correct; i++)
         {
-            for (int j = 0; j < l; j++)
+            for (int j = 0; j < l ; j++)
             {
                 if (m(i,j) != mT(j,i))
                 {
-                    std::cout << "problem" << std::endl;
+                    correct = false;
+                    break;
                 }
             }
         }
 
-        std::cout << "Transpose Is Correct" << std::endl;
+        if (correct)
+        {
+            std::cout << "Transpose Is Correct" << std::endl;
+        }
+        else
+        {
+            std::cout << "Transpose Is Not Correct!!!!" << std::endl;
+        }
     }
 
 }
 
 void TensorTest()
 {
-    constexpr Coords dim{1, 2, 2, 2};
+    constexpr Coords dim{2, 3, 4, 5};
 
     Tensor4 t(dim);
     float val = 0;
@@ -71,7 +80,7 @@ void TensorTest()
 
     t.print();
 
-    constexpr std::array permutation = {1,0,3,2};
+    constexpr std::array permutation = {0,1,3,2};
     const auto permT = t.shuffle(permutation);
 
     std::cout<<"Permutation: "<<std::endl;
