@@ -3,9 +3,10 @@
 //
 
 #include "Tensor4.h"
-#include "Utils.h"
 #include <iostream>
 #include <ostream>
+#include <queue>
+#include "Utils.h"
 namespace
 {
     using Coords = Tensor4::Coords;
@@ -16,21 +17,7 @@ namespace
     {
         return ((i[0] * d[1] + i[1]) * d[2] + i[2]) * d[3] + i[3];
     }
-
-    // Function to get multi-dimensional indices from a flat array index
-    Coords getMultiDimIndices(const Coords d, int index)
-    {
-        const int l = index % d[3];
-        index /= d[3];
-        const int k = index % d[2];
-        index /= d[2];
-        const int j = index % d[1];
-        index /= d[1];
-        const int i = index;
-
-        return Coords{i, j, k, l};
-    }
-
+    
     void printTensor(const float* tensor, const Coords d) {
         for (int i = 0; i < d[0]; ++i) {
             std::cout << "Matrix (d0=" << i << "):\n";
@@ -65,42 +52,67 @@ namespace
     {
         const auto newDim = ApplyPerm(dim, perm);
 
-        const int tensor_size = dim[0] * dim[1] * dim[2] * dim[3];
-        constexpr int block_size = 32;
-        const int num_blocks = (tensor_size + block_size - 1) / block_size;
-
-        for (int block = 0; block < num_blocks; ++block)
-        {
-            const int block_start = block * block_size;
-            const int block_end = std::min(block_start + block_size, tensor_size);
-
-            for (int index = block_start; index < block_end; ++index) {
-                const auto idxs = ApplyPerm(getMultiDimIndices(dim, index), perm);
-
-                const int old_index = index;
-                const int new_index = getIndex(newDim, idxs);
-                output[new_index] = input[old_index];
-            }
-        }
+        for (int i=0;i<dim[0];++i)
+            for(int j = 0;j<dim[1];++j)
+                for (int k = 0;k<dim[2];++k)
+                    for (int l = 0;l<dim[3];++l)
+                    {
+                        const auto idxs = ApplyPerm({i, j, k, l}, perm);
+                        const auto newIndex = getIndex(newDim, idxs);
+                        const auto oldIndex = getIndex(dim, {i,j,k,l});
+                        output[newIndex] = input[oldIndex];
+                    }
     }
-    
+
+
+    // Function to permute the dimensions of a 4D tensor using a permutation array as a chain of repeated permutations.
+    // shuffleTensor still needs a refactor to look like a matrix transpose with extra strides.
+    float* shuffleIterative(const float* input, float* newTensor, const std::array<int, 4>& dims, const std::array<int, 4>& perm)
+    {
+        auto newPerm = perm;
+        auto newDims = dims;
+        for (int i=0;i<4;++i)
+            for (int j=i+1;j<4;++j)
+            {
+                if (newPerm[j] < newPerm[i])
+                {
+                    std::array tempPerm = {0,1,2,3};
+                    std::swap(tempPerm[i], tempPerm[j]);
+                    shuffleTensor(input, newTensor, newDims, tempPerm);
+                    std::swap(newDims[i], newDims[j]);
+                    std::swap(newPerm[i], newPerm[j]);
+                }
+            }
+
+        return newTensor;
+    }
 
 }
 Tensor4::Tensor4(const Coords dims) :
-    _data(static_cast<float *>(malloc(dims[0] * dims[1] * dims[2] * dims[3] * sizeof(float))), &free), _dims(dims)
+    _data(dims[0] * dims[1] * dims[2] * dims[3] ), _dims(dims)
 {
 }
 
-float &Tensor4::operator[](const Coords c) const { return _data.get()[getIndex(_dims, c)]; }
+float &Tensor4::operator[](const Coords c)
+{
+    auto * ptr = _data.data();
+    return ptr[getIndex(_dims, c)];
+}
 Tensor4 Tensor4::shuffle(const std::array<int, 4> perm) const
 {
     Tensor4 ret(ApplyPerm(_dims, perm));
-    shuffleTensor(_data.get(), ret._data.get(), _dims, perm);
+    shuffleTensor(_data.data(), ret._data.data(), _dims, perm);
 
     return std::move(ret);
 }
 
+Tensor4 Tensor4::shuffleIterative(Coords perm) const
+{
+    Tensor4 ret(ApplyPerm(_dims, perm));
+    ::shuffleIterative(_data.data(), ret._data.data(), _dims, perm);
 
+    return std::move(ret);
+}
 
 Tensor4 Tensor4::shuffle2(const Coords perm1, const Coords perm2) const
 {
@@ -108,17 +120,11 @@ Tensor4 Tensor4::shuffle2(const Coords perm1, const Coords perm2) const
     return shuffle(newPerm);
 }
 
-void Tensor4::print() const { printTensor(_data.get(), _dims); }
+void Tensor4::print() const { printTensor(_data.data(), _dims); }
 bool Tensor4::operator==(const Tensor4 &other) const
 {
-    if (_dims != other._dims)
+    if (_dims != other._dims || _data != other._data)
         return false;
-
-    for (int i=0;i< _dims[0] * _dims[1] * _dims[2] * _dims[3];++i)
-    {
-        if (_data.get()[i] != other._data.get()[i])
-            return false;
-    }
 
     return true;
 }

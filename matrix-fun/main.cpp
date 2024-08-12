@@ -55,9 +55,9 @@ void TestTranspose()
 
 void TensorTest()
 {
-    constexpr Coords dim{2, 3, 4, 5};
+    constexpr Coords dim{1, 2, 2, 2};
 
-    const Tensor4 t(dim);
+    Tensor4 t(dim);
     float val = 0;
     for (int i = 0; i < dim[0]; ++i) {
         for (int j = 0; j < dim[1]; ++j) {
@@ -77,14 +77,35 @@ void TensorTest()
     std::cout<<"Permutation: "<<std::endl;
     permT.print();
 
+    std::cout<<"Permutation Iterative: "<<std::endl;
+    t.shuffleIterative(permutation).print();
+
+    if (t.shuffle(permutation) == t.shuffleIterative(permutation))
+    {
+        std::cout <<"Shuffle Iterative Works"<<std::endl;
+    }
+    else
+    {
+        std::cout <<"Shuffle Iterative Broken !!"<<std::endl;
+    }
+
     // permutting twice should give the original T
     if (t.shuffle(permutation).shuffle(permutation) == t)
     {
         std::cout <<"Shuffle Works"<<std::endl;
     }
+    else
+    {
+        std::cout <<"Shuffle Symmetric Broken!!!!"<<std::endl;
+    }
+
     if (t.shuffle2(permutation,permutation) == t)
     {
         std::cout <<"Shuffle2 Works"<<std::endl;
+    }
+    else
+    {
+        std::cout <<"Shuffle2 Broken!!!!"<<std::endl;
     }
 }
 

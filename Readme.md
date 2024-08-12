@@ -20,5 +20,5 @@ Please find the matrix class
 - If a permutation swaps only 2 axis, the operation can be expressed as a "transpose", if the transpose routine can accept 2 extra strides. Memory is not contiguous
 
 *Question 5*
-- I need to refactor the question 1 utility function to accept the 2 extra strides.
+- I need to refactor the question 1 utility function to accept the 2 extra strides. Current solution swaps, but the code is not common with Q1
 Did not finish !!!

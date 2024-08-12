@@ -1,13 +1,13 @@
 #pragma once
 #include <array>
-#include <memory>
+#include <vector>
 
 class Tensor4
 {
 public:
     using Coords = std::array<int, 4>;
     explicit Tensor4(Coords dims);
-    float& operator[](Coords c) const;
+    float& operator[](Coords c) ;
 
     [[nodiscard]] Tensor4 shuffle(Coords perm) const;
     [[nodiscard]] Tensor4 shuffle2(Coords perm1,Coords perm2 ) const;
@@ -17,8 +17,7 @@ public:
    // [[nodiscard]] Tensor4 transpose() const;
 
 private:
-    using raw_mem = std::unique_ptr<float, decltype(&free)>;
-    raw_mem _data;
+    std::vector<float> _data;
     Coords _dims;
 };
 
