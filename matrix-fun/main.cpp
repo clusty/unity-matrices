@@ -1,7 +1,8 @@
-#include <iostream>
 #include <chrono>
-#include "matrix.h"
+#include <iostream>
 #include "Tensor4.h"
+#include "Utils.h"
+#include "matrix.h"
 
 using Coords = Tensor4::Coords;
 
@@ -98,8 +99,11 @@ void TensorTest()
         std::cout <<"Shuffle Iterative Broken !!"<<std::endl;
     }
 
+    std::array<int,4> invPerm;
+    utils::InversePermutation(permutation, invPerm);
+
     // permutting twice should give the original T
-    if (t.shuffle(permutation).shuffle(permutation) == t)
+    if (t.shuffle(permutation).shuffle(invPerm) == t)
     {
         std::cout <<"Shuffle Works"<<std::endl;
     }
@@ -108,7 +112,7 @@ void TensorTest()
         std::cout <<"Shuffle Symmetric Broken!!!!"<<std::endl;
     }
 
-    if (t.shuffle2(permutation,permutation) == t)
+    if (t.shuffle2(permutation,invPerm) == t)
     {
         std::cout <<"Shuffle2 Works"<<std::endl;
     }

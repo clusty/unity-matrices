@@ -79,4 +79,12 @@ namespace utils
             }
         }
     }
+
+    inline void InversePermutation(const std::array<int,4> first,  std::array<int,4> & out)
+    {
+        for(auto i = 0; i < first.size(); ++i)
+        {
+            out[first[i]] = i;
+        }
+    }
 }
