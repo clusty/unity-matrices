@@ -7,11 +7,13 @@ Please find the matrix class
 Two implementations: blocked and recursive Divide and conquer.
 The recursive is a bit faster, stats in the main test function (I cannot fully explain the difference)
 They were attempts at creating cache oblivious transposes.
+
 Question 2:
 
 Please find the Tensor class (shuffle)
 This algorithm is only a "tiled" version (1d block). Simplicity was the reason
 Tested mostly that the permutations are symmetric: applying the invererse permutation yields the same as input.
+
 Question 3
 
 Permutations are composable, so first compose permutations and then call Question 2
