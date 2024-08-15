@@ -17,7 +17,7 @@ Please find the matrix class
 - Permutations are composable, so first compose permutations and then call Question 2
 
 *Question 4*
-- If a permutation swaps only 2 axis, the operation can be expressed as a "transpose", if the transpose routine can accept 2 extra strides. Memory is not contiguous
+- If a permutation is even it can be expressed as a transposition. the transpose routine can accept 2 extra strides. Memory is not contiguous.
 
 *Question 5*
 - I need to refactor the question 1 utility function to accept the 2 extra strides. Current solution swaps, but the code is not common with Q1
